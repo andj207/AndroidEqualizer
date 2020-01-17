@@ -101,28 +101,20 @@ public class DialogEqualizerFragment extends DialogFragment {
             Settings.equalizerModel.setBassStrength((short) (1000 / 19));
         }
 
-        mEqualizer = new Equalizer(0, audioSesionId);
-
-        bassBoost = new BassBoost(0, audioSesionId);
-        bassBoost.setEnabled(true);
-        BassBoost.Settings bassBoostSettingTemp = bassBoost.getProperties();
-        BassBoost.Settings bassBoostSetting = new BassBoost.Settings(bassBoostSettingTemp.toString());
-        bassBoostSetting.strength = Settings.equalizerModel.getBassStrength();
-        bassBoost.setProperties(bassBoostSetting);
-
-        presetReverb = new PresetReverb(0, audioSesionId);
-        presetReverb.setPreset(Settings.equalizerModel.getReverbPreset());
-        presetReverb.setEnabled(true);
-
-        mEqualizer.setEnabled(true);
-
-        if (Settings.presetPos == 0) {
-            for (short bandIdx = 0; bandIdx < mEqualizer.getNumberOfBands(); bandIdx++) {
-                mEqualizer.setBandLevel(bandIdx, (short) Settings.seekbarpos[bandIdx]);
-            }
-        } else {
-            mEqualizer.usePreset((short) Settings.presetPos);
+        if (Settings.equalizer == null){
+            Settings.equalizer = new Equalizer(0, audioSesionId);
         }
+        mEqualizer = Settings.equalizer;
+
+        if (Settings.bassBoost == null){
+            Settings.bassBoost = new BassBoost(0, audioSesionId);
+        }
+        bassBoost = Settings.bassBoost;
+
+        if (Settings.presetReverb == null){
+            Settings.presetReverb = new PresetReverb(0, audioSesionId);
+        }
+        presetReverb = Settings.presetReverb;
     }
 
     @Override
@@ -466,21 +458,7 @@ public class DialogEqualizerFragment extends DialogFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        if (mEqualizer != null){
-            mEqualizer.release();
-        }
-
-        if (bassBoost != null){
-            bassBoost.release();
-        }
-
-        if (presetReverb != null){
-            presetReverb.release();
-        }
-
         Settings.isEditing = false;
-
     }
 
     public static class Builder {

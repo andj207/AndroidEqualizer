@@ -3,6 +3,7 @@ package com.bullhead.equalizer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -19,6 +20,7 @@ import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 import com.db.chart.model.LineSet;
 import com.db.chart.view.AxisController;
@@ -72,6 +74,7 @@ public class EqualizerFragment extends Fragment {
     private int audioSesionId;
 
     static int themeColor = Color.parseColor("#B24242");
+    static int backgroundColor = Color.DKGRAY;
     static boolean showBackButton = true;
 
     public static EqualizerFragment newInstance(int audioSessionId) {
@@ -100,29 +103,20 @@ public class EqualizerFragment extends Fragment {
             Settings.equalizerModel.setBassStrength((short) (1000 / 19));
         }
 
-        mEqualizer = new Equalizer(0, audioSesionId);
-
-        bassBoost = new BassBoost(0, audioSesionId);
-        bassBoost.setEnabled(Settings.isEqualizerEnabled);
-        BassBoost.Settings bassBoostSettingTemp = bassBoost.getProperties();
-        BassBoost.Settings bassBoostSetting = new BassBoost.Settings(bassBoostSettingTemp.toString());
-        bassBoostSetting.strength = Settings.equalizerModel.getBassStrength();
-        bassBoost.setProperties(bassBoostSetting);
-
-        presetReverb = new PresetReverb(0, audioSesionId);
-        presetReverb.setPreset(Settings.equalizerModel.getReverbPreset());
-        presetReverb.setEnabled(Settings.isEqualizerEnabled);
-
-        mEqualizer.setEnabled(Settings.isEqualizerEnabled);
-
-        if (Settings.presetPos == 0){
-            for (short bandIdx = 0; bandIdx < mEqualizer.getNumberOfBands(); bandIdx++) {
-                mEqualizer.setBandLevel(bandIdx, (short) Settings.seekbarpos[bandIdx]);
-            }
+        if (Settings.equalizer == null){
+            Settings.equalizer = new Equalizer(0, audioSesionId);
         }
-        else {
-            mEqualizer.usePreset((short) Settings.presetPos);
+        mEqualizer = Settings.equalizer;
+
+        if (Settings.bassBoost == null){
+            Settings.bassBoost = new BassBoost(0, audioSesionId);
         }
+        bassBoost = Settings.bassBoost;
+
+        if (Settings.presetReverb == null){
+            Settings.presetReverb = new PresetReverb(0, audioSesionId);
+        }
+        presetReverb = Settings.presetReverb;
     }
 
     @Override
@@ -142,6 +136,9 @@ public class EqualizerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        View backgroundView = view.findViewById(R.id.equalizer_content);
+        backgroundView.setBackgroundColor(backgroundColor);
+
         backBtn = view.findViewById(R.id.equalizer_back_btn);
         backBtn.setVisibility(showBackButton ? View.VISIBLE : View.GONE);
         backBtn.setOnClickListener(new View.OnClickListener() {
@@ -158,6 +155,7 @@ public class EqualizerFragment extends Fragment {
 
         equalizerSwitch = view.findViewById(R.id.equalizer_switch);
         equalizerSwitch.setChecked(Settings.isEqualizerEnabled);
+        equalizerSwitch.setThumbTintList(ColorStateList.valueOf(themeColor));
         equalizerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -183,6 +181,7 @@ public class EqualizerFragment extends Fragment {
 
 
         chart = view.findViewById(R.id.lineChart);
+        chart.getBackground().setTint(ColorUtils.blendARGB(backgroundColor, Color.BLACK, 0.2f));
         paint = new Paint();
         dataset = new LineSet();
 
@@ -192,11 +191,14 @@ public class EqualizerFragment extends Fragment {
         bassController.setLabel("BASS");
         reverbController.setLabel("3D");
 
+        bassController.circlePaint.setColor(ColorUtils.setAlphaComponent(0x000, 0x33));
         bassController.circlePaint2.setColor(themeColor);
         bassController.linePaint.setColor(themeColor);
         bassController.invalidate();
+
+        reverbController.circlePaint.setColor(ColorUtils.setAlphaComponent(0x000, 0x33));
         reverbController.circlePaint2.setColor(themeColor);
-        bassController.linePaint.setColor(themeColor);
+        reverbController.linePaint.setColor(themeColor);
         reverbController.invalidate();
 
         if (!Settings.isEqualizerReloaded) {
@@ -249,8 +251,10 @@ public class EqualizerFragment extends Fragment {
             public void onProgressChanged(int progress) {
                 Settings.bassStrength = (short) (((float) 1000 / 19) * (progress));
                 try {
-                    bassBoost.setStrength(Settings.bassStrength);
-                    Settings.equalizerModel.setBassStrength(Settings.bassStrength);
+                    if (bassBoost.getStrengthSupported()){
+                        bassBoost.setStrength(Settings.bassStrength);
+                        Settings.equalizerModel.setBassStrength(Settings.bassStrength);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -346,7 +350,7 @@ public class EqualizerFragment extends Fragment {
                     break;
             }
             seekBarFinal[i] = seekBar;
-            seekBar.getProgressDrawable().setColorFilter(new PorterDuffColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_IN));
+            seekBar.getProgressDrawable().setColorFilter(new PorterDuffColorFilter(themeColor, PorterDuff.Mode.SRC_IN));
             seekBar.getThumb().setColorFilter(new PorterDuffColorFilter(themeColor, PorterDuff.Mode.SRC_IN));
             seekBar.setId(i);
 //            seekBar.setLayoutParams(layoutParams);
@@ -482,18 +486,6 @@ public class EqualizerFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mEqualizer != null){
-            mEqualizer.release();
-        }
-
-        if (bassBoost != null){
-            bassBoost.release();
-        }
-
-        if (presetReverb != null){
-            presetReverb.release();
-        }
-
         Settings.isEditing = false;
     }
 
@@ -511,6 +503,11 @@ public class EqualizerFragment extends Fragment {
 
         public Builder setAccentColor(int color) {
             themeColor = color;
+            return this;
+        }
+
+        public Builder setBackgroundColor(int color){
+            backgroundColor = color;
             return this;
         }
 

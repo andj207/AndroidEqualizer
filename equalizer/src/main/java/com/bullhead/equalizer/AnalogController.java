@@ -8,6 +8,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.core.graphics.ColorUtils;
+
 /**
  * Created by Harjot on 23-May-16.
  */
@@ -18,7 +20,7 @@ public class AnalogController extends View {
     String angle;
     float currdeg, deg = 3, downdeg;
 
-    int progressColor, lineColor;
+    int progressColor, lineColor, circleColor;
 
     onProgressChangedListener mListener;
 
@@ -48,6 +50,7 @@ public class AnalogController extends View {
     }
 
     void init() {
+        circleColor = ColorUtils.setAlphaComponent(0x000, 0x44);
         textPaint = new Paint();
         textPaint.setColor(Color.WHITE);
         textPaint.setStyle(Paint.Style.FILL);
@@ -55,7 +58,7 @@ public class AnalogController extends View {
         textPaint.setFakeBoldText(true);
         textPaint.setTextAlign(Paint.Align.CENTER);
         circlePaint = new Paint();
-        circlePaint.setColor(Color.parseColor("#222222"));
+        circlePaint.setColor(circleColor);
         circlePaint.setStyle(Paint.Style.FILL);
         circlePaint2 = new Paint();
         circlePaint2.setColor(EqualizerFragment.themeColor);
@@ -84,7 +87,7 @@ public class AnalogController extends View {
             float tmp = (float) i / 24;
             x = midx + (float) (radius * Math.sin(2 * Math.PI * (1.0 - tmp)));
             y = midy + (float) (radius * Math.cos(2 * Math.PI * (1.0 - tmp)));
-            circlePaint.setColor(Color.parseColor("#111111"));
+            circlePaint.setColor(circleColor);
             canvas.drawCircle(x, y, ((float) radius / 15), circlePaint);
         }
         for (int i = 3; i <= deg3; i++) {
@@ -100,9 +103,9 @@ public class AnalogController extends View {
         float x2 = midx + (float) (radius * ((float) 3 / 5) * Math.sin(2 * Math.PI * (1.0 - tmp2)));
         float y2 = midy + (float) (radius * ((float) 3 / 5) * Math.cos(2 * Math.PI * (1.0 - tmp2)));
 
-        circlePaint.setColor(Color.parseColor("#222222"));
+        circlePaint.setColor(circleColor);
         canvas.drawCircle(midx, midy, radius * ((float) 13 / 15), circlePaint);
-        circlePaint.setColor(Color.parseColor("#000000"));
+        circlePaint.setColor(circleColor);
         canvas.drawCircle(midx, midy, radius * ((float) 11 / 15), circlePaint);
         canvas.drawText(label, midx, midy + (float) (radius * 1.1), textPaint);
         canvas.drawLine(x1, y1, x2, y2, linePaint);
