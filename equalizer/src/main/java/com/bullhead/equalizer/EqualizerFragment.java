@@ -35,7 +35,7 @@ import java.util.ArrayList;
  */
 public class EqualizerFragment extends Fragment {
 
-    public static final String ARG_AUDIO_SESSIOIN_ID = "audio_session_id";
+    public static final String ARG_AUDIO_SESSION_ID = "audio_session_id";
 
     ImageView backBtn;
     TextView fragTitle;
@@ -80,7 +80,7 @@ public class EqualizerFragment extends Fragment {
     public static EqualizerFragment newInstance(int audioSessionId) {
 
         Bundle args = new Bundle();
-        args.putInt(ARG_AUDIO_SESSIOIN_ID, audioSessionId);
+        args.putInt(ARG_AUDIO_SESSION_ID, audioSessionId);
 
         EqualizerFragment fragment = new EqualizerFragment();
         fragment.setArguments(args);
@@ -93,8 +93,8 @@ public class EqualizerFragment extends Fragment {
 
         Settings.isEditing = true;
 
-        if (getArguments() != null && getArguments().containsKey(ARG_AUDIO_SESSIOIN_ID)){
-            audioSesionId = getArguments().getInt(ARG_AUDIO_SESSIOIN_ID);
+        if (getArguments() != null && getArguments().containsKey(ARG_AUDIO_SESSION_ID)){
+            audioSesionId = getArguments().getInt(ARG_AUDIO_SESSION_ID);
         }
 
         if (Settings.equalizerModel == null){
@@ -486,6 +486,7 @@ public class EqualizerFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        ctx = null;
         Settings.isEditing = false;
     }
 
