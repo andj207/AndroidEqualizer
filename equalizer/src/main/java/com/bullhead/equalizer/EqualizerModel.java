@@ -12,6 +12,7 @@ public class EqualizerModel implements Serializable {
     private int presetPos;
     private short reverbPreset;
     private short bassStrength;
+    private short virtualizerStrength;
 
     public EqualizerModel() {
         isEqualizerEnabled = true;
@@ -57,5 +58,13 @@ public class EqualizerModel implements Serializable {
 
     public void setBassStrength(short bassStrength) {
         this.bassStrength = bassStrength;
+    }
+
+    public short getVirtualizerStrength() {
+        return virtualizerStrength;
+    }
+
+    public void setVirtualizerStrength(short virtualizerStrength) {
+        this.virtualizerStrength = virtualizerStrength;
     }
 }
