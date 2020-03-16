@@ -22,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -132,7 +131,6 @@ public class EqualizerFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -193,12 +191,16 @@ public class EqualizerFragment extends Fragment {
             equalizerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    equalizer.setEnabled(isChecked);
-                    bassBoost.setEnabled(isChecked);
-                    virtualizer.setEnabled(isChecked);
-                    presetReverb.setEnabled(isChecked);
-                    Settings.isEqualizerEnabled = isChecked;
-                    Settings.equalizerModel.setEqualizerEnabled(isChecked);
+                    try {
+                        equalizer.setEnabled(isChecked);
+                        bassBoost.setEnabled(isChecked);
+                        virtualizer.setEnabled(isChecked);
+                        presetReverb.setEnabled(isChecked);
+                        Settings.isEqualizerEnabled = isChecked;
+                        Settings.equalizerModel.setEqualizerEnabled(isChecked);
+                    } catch (Throwable e){
+                        e.printStackTrace();
+                    }
                 }
             });
 
@@ -553,6 +555,10 @@ public class EqualizerFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         ctx = null;
+        equalizer = null;
+        bassBoost = null;
+        presetReverb = null;
+        virtualizer = null;
         Settings.isEditing = false;
     }
 
