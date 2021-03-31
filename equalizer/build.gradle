@@ -4,7 +4,7 @@ group="com.github.mosamabinomar"
 version="2.0"
 
 android {
-    compileSdkVersion compileSdk
+    compileSdkVersion appCompileSdk
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion targetSdk
@@ -15,7 +15,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

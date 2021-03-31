@@ -439,12 +439,16 @@ public class EqualizerFragment extends Fragment {
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        equalizer.setBandLevel(equalizerBandIndex, (short) (progress + lowerEqualizerBandLevel));
-                        points[seekBar.getId()] = equalizer.getBandLevel(equalizerBandIndex) - lowerEqualizerBandLevel;
                         Settings.seekbarpos[seekBar.getId()] = (progress + lowerEqualizerBandLevel);
                         Settings.equalizerModel.getSeekbarpos()[seekBar.getId()] = (progress + lowerEqualizerBandLevel);
-                        dataset.updateValues(points);
-                        chart.notifyDataUpdate();
+                        try {
+                            equalizer.setBandLevel(equalizerBandIndex, (short) (progress + lowerEqualizerBandLevel));
+                            points[seekBar.getId()] = equalizer.getBandLevel(equalizerBandIndex) - lowerEqualizerBandLevel;
+                            dataset.updateValues(points);
+                            chart.notifyDataUpdate();
+                        } catch (Throwable e){
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
